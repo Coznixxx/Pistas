@@ -1,0 +1,46 @@
+ protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            String pregunta=request.getParameter("txtPregunta");
+            String correcta=request.getParameter("txtCorrecta");
+            String op1=request.getParameter("txtOp1");
+            String op2=request.getParameter("txtOp2");
+            String op3=request.getParameter("txtOp3");
+            String op4=request.getParameter("txtOp4");
+            statement.executeUpdate("insert into pistas (pregunta,correcta,opcion1,opcion2,opcion3,opcion4) values ('"+ pregunta +"','" + op1 + "','" + op2 + "','" + op3 + "','" + op4 + "','" + correcta + "')");
+            responderOk(out);
+            }
+        } 
+        catch(SQLException ex){
+           responderError(out);
+           
+        }
+    
+     }
+     private void responderOk(PrintWriter out){
+         out.println("<html><body>");
+         out.println("<h1>ALTA CONFIRMADA</h1>");
+         out.println("<form action=\"frmCuestionario.html\">");
+         out.println("<input type=\"submit\" value=\"Ingresar otra pregunta\">");
+         out.println("</form>");        
+         out.println("<p>");
+         out.println("<form action=\"index.html\">");
+         out.println("<input type=\"submit\" value=\"Volver al index\">");
+         out.println("</form>");
+         out.println("</body></html>");
+     }
+     private void responderError(PrintWriter out){
+         out.println("<html><body>");
+         out.println("<h1>Hubo un problema de SQL</h1>");
+         out.println("<form action=\"frmCuestionario.html\">");
+         out.println("<input type=\"submit\" value=\"Ingresar otra pregunta\">");
+         out.println("</form>");        
+         out.println("<p>");
+         out.println("<form action=\"index.html\">");
+         out.println("<input type=\"submit\" value=\"Volver al index\">");
+         out.println("</form>");
+         out.println("</body></html>");
+     }
+}
