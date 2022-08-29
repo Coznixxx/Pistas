@@ -1,0 +1,65 @@
+package paquetegod;
+
+import java.io.*;
+import java.sql.*;
+import javax.servlet.*;
+import javax.servlet.http.*;
+import java.util.*;
+
+public class ComprobarRespuesta extends HttpServlet {
+    Connection connection=null;
+    Statement statement=null;
+    ResultSet resultSet=null;
+    public static int c1;
+    public static int c2;
+    PreparedStatement preparedStatement = null;
+    public void init(ServletConfig config) throws ServletException{
+        super.init(config);
+        try{
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection=DriverManager.getConnection("jdbc:derby://localhost:1527/PistasBDD");
+            statement=connection.createStatement();
+        } catch (ClassNotFoundException ex) {
+            System.out.println("No se pudo cargar el controlador: " + ex.getMessage());
+        } catch (SQLException ex){
+            System.out.println("Hubo un error en el SQL: " + ex.getMessage());
+        }
+ 
+    }
+    
+    
+     protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        request.setCharacterEncoding("UTF-8");
+        PrintWriter out = response.getWriter();
+        try {
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Trivia</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            String respuesta=request.getParameter("opcion");
+            String correcta=request.getParameter("correcta");
+            if (respuesta.equals(correcta)){
+                out.println("<h1>RESPUESTA CORRECTA<h1>");
+                out.println("<form method= \"GET\" action= \"JuegoJava\">");
+                out.println("<input type=\"submit\" value=\"Siguiente pregunta\">");
+                out.println("</form>");
+                c1=c1+1;
+            }
+            if (!respuesta.equals(correcta)){ 
+                out.println("<h1>RESPUESTA INCORRECTA<h1>");
+                out.println("<form method= \"GET\" action= \"JuegoJava\">");
+                out.println("<input type=\"submit\" value=\"Siguiente pregunta\">");
+                out.println("</form>");
+                c2=c2+1;
+            }
+        }finally {            
+            out.println("</body>");
+            out.println("</html>");
+        }
+
+
+}
+}
