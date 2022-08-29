@@ -1,0 +1,84 @@
+package paquetegod;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+
+public class JuegoJava extends HttpServlet {
+    Connection connection=null;
+    Statement statement=null;
+    ResultSet resultSet=null;
+    public void init(ServletConfig config) throws ServletException{
+        super.init(config);
+        try{
+            Class.forName("org.apache.derby.jdbc.ClientDriver");
+            connection=DriverManager.getConnection("jdbc:derby://localhost:1527/PistasBDD");
+            statement=connection.createStatement();
+            resultSet=statement.executeQuery("Select * from PISTAS");
+        } catch (ClassNotFoundException ex) {
+            System.out.println("No se pudo cargar el controlador: " + ex.getMessage());
+        } catch (SQLException ex){
+            System.out.println("Hubo un error en el SQL: " + ex.getMessage());
+        }
+    }
+
+    
+    protected void doGet (HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        response.setContentType("text/html;charset=UTF-8");
+        PrintWriter out = response.getWriter();
+        try{
+            out.println("<!DOCTYPE html>");
+            out.println("<html>");
+            out.println("<head>");
+            out.println("<title>Trivia</title>");            
+            out.println("</head>");
+            out.println("<body>");
+            
+            
+            if (resultSet.next()){
+                String pregunta=resultSet.getString("pregunta");
+                String correcta=resultSet.getString("correcta");
+                String op1=resultSet.getString("opcion1");
+                String op2=resultSet.getString("opcion2");
+                String op3=resultSet.getString("opcion3");
+                String op4=resultSet.getString("opcion4");
+                out.println("<h1>Ingresa la respuesta correcta</h1>");
+                out.println("<form method=\"POST\" accept-charset=\"character_set\" action=\"ComprobarRespuesta\">");
+                out.println("<h2>"+ pregunta + "</h2>");
+                out.println("<p><input type=\"radio\" name=\"opcion\" value=\"" + op1 + "\" required>");
+                out.println("<label for=" + op1 + ">" + op1 + "</label><br>");
+                out.println("<p><input type=\"radio\" name=\"opcion\" value=\"" + op2 + "\">");
+                out.println("<label for=" + op2 + ">" + op2 + "</label><br>");
+                out.println("<p><input type=\"radio\" name=\"opcion\" value=\"" + op3 + "\">");
+                out.println("<label for=" + op3 + ">" + op3 + "</label><br>");
+                out.println("<p><input type=\"radio\" name=\"opcion\" value=\"" + op4 + "\">");
+                out.println("<label for=" + op4 + ">" + op4 + "</label><br>");
+                out.println("<p><input type=\"radio\"  name=\"correcta\" value=\"" + correcta + "\" style=\"display: none;\" checked>");
+                out.println("<p><input type=\"submit\" value=\"Ingresar\">");
+                out.println("</form>");
+            }
+            else {
+                out.println("<h1>JUEGO TERMINADO</h1>");
+                out.println("<form method=\"GET\" action=\"PantallaFinal\">");
+                out.println("<input type=\"submit\" value=\"Ver puntuación\">");
+                out.println("</form>");
+            }
+        }catch(SQLException ex){
+        System.out.println("Hubo un error en el SQL: " + ex.getMessage());
+        } finally {            
+            out.println("</body>");
+            out.println("</html>");
+        }
+        }
+    }
